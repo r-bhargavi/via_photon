@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+<!--send mail template for credit application emails to users-->
+        <record id="email_template_for_credit_info" model="mail.template">
+		    <field name="name">Credit Information</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">New Credit Application From Webform as ${object.name}</field>
+            <field name="model_id" ref="base_vph.model_website_form_api"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html"><![CDATA[
+                    <div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+                        <p>Yohoo!!,</p>
+				    <p>We have a new contact applying for credit through our webform. If you have any questions related to this mail, you can contact Ha.”</p>
+				</div>
+                    ]]>
+            </field>
+        </record>
+        <!--send mail to customer for cpq quotation sales-->
+         <record id="email_template_for_cpq_customer" model="mail.template">
+		    <field name="name">CPQ Customer Quote</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">New Sale Quotation Ref ${object.name}</field>
+            <field name="model_id" ref="base_vph.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html"><![CDATA[
+                    <div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+                        <p>Yohoo!!,</p>
+				    <p>
+				    Thank you for visiting our website.
+                        We have received your request for a quote.
+                        One of our team members will contact you as soon as possible.
+                    </p>
+				</div>
+                    ]]>
+            </field>
+        </record>
+        <!--send mail to sales representative about the cpq inquiry on products or services-->
+         <record id="email_template_for_cpq_sales_repsentative" model="mail.template">
+		    <field name="name">Quotation Sale CPQ</field>
+		    <field name="email_from">${(user.email or '')|safe}</field>
+		    <field name="subject">New Sale in Draft From CPQ as ${object.name}</field>
+            <field name="model_id" ref="base_vph.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="body_html"><![CDATA[
+                    <div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+                        <p>Yohoo!!,</p>
+				    <p>We have a new client on board inquiring for our products and services.If you have any questions related to this mail, you can contact Ha.”</p>
+				</div>
+                    ]]>
+            </field>
+        </record>
+
+    </data>
+</odoo>
