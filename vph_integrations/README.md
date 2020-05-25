@@ -1,13 +1,2 @@
-# base_vph
-
----
-
-An Odoo custom module developed by GFP Solutions LLC for viaPhoton
-
----
-
-**Odoo Version:** 13.0 enterprise
-
-**User**: viaPhoton
-
-**Author**: GFP Solutions LLC
+# vph_integrations
+All Base Integrations like Blink,JGR etc coding exist in thsi repository
