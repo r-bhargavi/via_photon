@@ -4,9 +4,41 @@ from odoo import api, fields, models, _
 import logging
 from urllib.parse import urljoin
 from urllib.parse import urlencode
-
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
+from odoo.http import JsonRequest, Response
+import json
+from odoo.tools import ustr, consteq, frozendict, pycompat, unique
+from odoo.tools import ustr, consteq, frozendict, pycompat, unique, date_utils
+
+# inherit _json_response to return id in response
+def _json_response(self, result=None, error=None):
+    response = {"jsonrpc": "2.0", "id": self.jsonrequest.get("id")}
+
+    if error is not None:
+        response["error"] = error
+    if result is not None:
+        response["result"] = result
+        if (
+            result != False
+            and isinstance(result, dict)
+            and result.get("id")
+            and isinstance(result.get("id"), int)
+        ):
+            response["id"] = result.get("id")
+
+    mime = "application/json"
+    body = json.dumps(response, default=date_utils.json_default)
+
+    return Response(
+        body,
+        status=error and error.pop("http_status", 200) or 200,
+        headers=[("Content-Type", mime), ("Content-Length", len(body))],
+    )
+
+
+JsonRequest._json_response = _json_response
 
 
 class WebsiteFormApi(models.Model):
@@ -14,49 +46,63 @@ class WebsiteFormApi(models.Model):
     _description = "Credit Applications"
 
     # company info
-    name = fields.Text(string="Name*", required=True)
+    name = fields.Char(string="Name*", required=True)
     # Address
     address = fields.Text(string="Address*", required=True)
-    city = fields.Text(string="City*", required=True)
-    state = fields.Text(string="State*", required=True)
-    zip = fields.Text(string="Zip*", required=True)
-    fein = fields.Text(string="FEIN*", required=True)
+    city = fields.Char(string="City*", required=True)
+    state = fields.Char(string="State*", required=True)
+    zip = fields.Char(string="Zip*", required=True)
+    fein = fields.Char(string="FEIN*", required=True)
     # key company contacts
     # main purchase contact
-    mp_name = fields.Text(string="Name")
-    mp_email = fields.Text(string="Email")
-    mp_phone = fields.Text("Phone")
+    mp_name = fields.Char(string="Name")
+    mp_email = fields.Char(string="Email")
+    mp_phone = fields.Char("Phone")
     # accounts payable details
-    ap_name = fields.Text("Name")
-    ap_email = fields.Text("Email")
-    ap_phone = fields.Text("Phone")
+    ap_name = fields.Char("Name")
+    ap_email = fields.Char("Email")
+    ap_phone = fields.Char("Phone")
     # owner/ceo details
-    owner_name = fields.Text("Name")
-    owner_email = fields.Text("Email")
-    owner_phone = fields.Text("Phone")
+    owner_name = fields.Char("Name")
+    owner_email = fields.Char("Email")
+    owner_phone = fields.Char("Phone")
     # cfo details
-    cfo_name = fields.Text("Name")
-    cfo_email = fields.Text("Email")
-    cfo_phone = fields.Text("Phone")
+    cfo_name = fields.Char("Name")
+    cfo_email = fields.Char("Email")
+    cfo_phone = fields.Char("Phone")
 
     # credit info
     credit_amt_req = fields.Text("Credit Amount")
-    dnb_no = fields.Text("D and B Number")
+    dnb_no = fields.Char("D and B Number")
 
     # Bank Reference and Payment Information
-    bank_contact = fields.Text("Bank Contact*", required=True)
-    bank_name = fields.Text("Bank Name*", required=True)
-    bank_email = fields.Text("Bank Email*", required=True)
-    bank_phone = fields.Text("Bank Phone*", required=True)
-
-    # ACH / Wire Instruction *
-
-    routing = fields.Char("Routing*", required=True)
-    acc_no = fields.Text("Account No*", required=True)
+    bank_contact = fields.Char("Bank Contact*", required=True)
+    bank_name = fields.Char("Bank Name*", required=True)
+    bank_email = fields.Char("Bank Email*", required=True)
+    bank_phone = fields.Char("Bank Phone*", required=True)
 
     # Trade References
     trade_ref_ids = fields.One2many("trade.ref.lines", "form_id", "Trade Ref")
     mail_sent = fields.Boolean("Mail Sent")
+
+    # cannot delete credit application
+    def unlink(self):
+        raise UserError(
+            _(
+                "You cannot delete a Credit Application.Please contact your Administrator!!"
+            )
+        )
+        return super(SaleOrder, self).unlink()
+
+    # return url to odoo domain
+    @api.model
+    def get_website_url(self):
+        # to send mail on credit info creation
+        base_url = self.env["ir.config_parameter"].get_param("web.base.url")
+        query = {"db": self._cr.dbname}
+        fragment = {"model": "website.form.api", "view_type": "form", "id": self.id}
+        url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
+        return url
 
     # send mail to users once credit application created
     def send_mail_credit_info(self):
@@ -69,40 +115,11 @@ class WebsiteFormApi(models.Model):
                     [user.partner_id.email + "," for user in recepient_users]
                 )
                 email_to = email_to[:-1]
-                body = "<b> Yohooo!</b>"
-                body += "</br>"
-                body += "<p> We have a new contact applying for credit through our webform.If you have any questions related to this mail, you can contact Ha</p>"
-                body += "</br>"
-                body += "<p>Below is the link to the application in Odoo</p>"
                 # to send mail on credit info creation
-                base_url = self.env["ir.config_parameter"].get_param("web.base.url")
-                query = {"db": self._cr.dbname}
-                fragment = {
-                    "model": "website.form.api",
-                    "view_type": "form",
-                    "id": record.id,
-                }
-                url = urljoin(
-                    base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment))
-                )
-                text_link = _("""<a href="%s">%s</a> """) % (
-                    url,
-                    "VIEW CREDIT APPLICATION",
-                )
-                body += "<li> " + str(text_link) + "</li>"
-
                 temp_id = self.env.ref("base_vph.email_template_for_credit_info")
                 if temp_id:
-                    base_url = self.env["ir.config_parameter"].get_param("web.base.url")
-                    query = {"db": self._cr.dbname}
-                    # email_from temporarily hardcoded once outgoing mail server
-                    # configured will remove it
                     temp_id.write(
-                        {
-                            "body_html": body,
-                            "email_to": email_to,
-                            "email_from": "bhargavi1809@gmail.com",
-                        }
+                        {"email_to": email_to,}
                     )
                     values = temp_id.generate_email(record.id)
                     mail_mail_obj = self.env["mail.mail"]
@@ -110,6 +127,29 @@ class WebsiteFormApi(models.Model):
                     msg_id.send()
             record.mail_sent = True
             # record.message_post(body=body)
+        return True
+
+    # credit applications are not allowed to be copied
+    def copy(self, default=None):
+        default = default or {}
+        res = super(WebsiteFormApi, self).copy(default)
+        raise UserError(_("You are not allowed to copy the Credit Application!!"))
+        return res
+
+    # sending mail to purchase contact of credit application
+    def send_mail_to_mp(self):
+        for record in self:
+            if record.mp_email:
+                email_to = record.mp_email
+                temp_id = self.env.ref("base_vph.email_template_main_purchase_contact")
+                if temp_id:
+                    temp_id.write(
+                        {"email_to": email_to,}
+                    )
+                    values = temp_id.generate_email(record.id)
+                    mail_mail_obj = self.env["mail.mail"]
+                    msg_id = mail_mail_obj.create(values)
+                    msg_id.send()
         return True
 
     # to create a record in credit info form through api call
@@ -122,9 +162,6 @@ class WebsiteFormApi(models.Model):
             bank_name = bank_info.get("bank_name")
             bank_email = bank_info.get("bank_email")
             bank_phn = bank_info.get("bank_phone")
-        for ach_info in json_dict.get("ach_info"):
-            routing = ach_info.get("routing")
-            acc_no = ach_info.get("acc_no")
         trade_list = []
         for trade_ref in json_dict.get("trade_ref_ids"):
             trade_dict = (
@@ -165,8 +202,6 @@ class WebsiteFormApi(models.Model):
                 "bank_name": bank_name,
                 "bank_email": bank_email,
                 "bank_phone": bank_phn,
-                "routing": routing,
-                "acc_no": acc_no,
                 "trade_ref_ids": trade_list,
             }
         )
@@ -177,6 +212,7 @@ class WebsiteFormApi(models.Model):
     def create(self, vals):
         web_form_id = super(WebsiteFormApi, self).create(vals)
         web_form_id.send_mail_credit_info()
+        web_form_id.send_mail_to_mp()
         return web_form_id
 
 

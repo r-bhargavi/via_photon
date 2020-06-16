@@ -7,7 +7,7 @@
 ###################################################################################
 
 {
-    "name": "Integrations Developments for viaPhoton",
+    "name": "Base Integrations Developments for viaPhoton",
     "category": "Hidden",
     "author": "Technosavvy Infotech",
     "summary": "Custom",
@@ -18,8 +18,13 @@ AUTHOR OF MODULE DOES NOT CLAIM ANY
 RESPONSIBILITY FOR ANY BEHAVIOR ONCE INSTALLED.
         """,
     "depends": [
+        "mrp",
+        "quality_control",
+        "mrp_account",
+        "quality",
+        "mrp_workorder",
+        "mrp_plm",
     ],
-    "data": [
-    ],
+    "data": [],
     "installable": True,
 }
