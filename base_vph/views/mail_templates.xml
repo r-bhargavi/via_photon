@@ -1,46 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
+    <data noupdate="1">
     <!--send mail template for credit application emails to users-->
         <record id="email_template_for_credit_info" model="mail.template">
-		    <field name="name">Credit Information</field>
+		    <field name="name">Credit Information Internal</field>
              <field name="email_from">${('erp@viaphoton.com') |safe}</field>
-		    <field name="subject">New Credit Application From Webform as ${object.name}</field>
+		    <field name="subject">New Credit Application | ${object.name}</field>
             <field name="model_id" ref="base_vph.model_website_form_api"/>
             <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
                     <div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
-                        <p>Yohoo!!,</p>
+                        <p>Hello there viaPhoton team,</p>
                         <br/>
-				    <p>We have a new contact applying for credit through our webform. If you have any questions related to this mail, you can contact Ha.”</p>
-                    <p>Please check the link below for more details:</p>
-
-                    % set website_url = object.get_website_url()
-                    Your Odoo domain is:
-                     <br/>
-                     <b><a href="${website_url}">VIEW DETAILS</a></b><br>
-                    <br/>
-                <p>Best regards,</p>
-				</div>
+				        <p>We have a new contact applying for credit. You can view more details in the link below.</p><br/>
+                        % set website_url = object.get_website_url()
+                        <b><a href="${website_url}">View Details</a></b><br>
+                        <br/>
+                        <p>Thank you and have a nice day.</p>
+                        <br/>
+                        <p style="margin-top: 0px; margin-bottom: 0px;margin-top:0px; margin-bottom:0px; margin-top:0px; margin-bottom:0px; margin:0px; color:rgb(50,49,48); font-size:15px; background-color:rgb(255,255,255)"><span style="margin:0px; font-size:10pt; font-family:&quot;Lucida Grande&quot;,sans-serif; color:rgb(61,73,89)"><img data-imagetype="AttachmentByCid" data-custom="AAMkADllMjQ3NDI4LWY5YzktNGM3Mi1iMDhkLTlhYWZmZTEyOTI0YQBGAAAAAABbcdyRJO1SQ74eb9PnXIdmBwC4euUVR0meTpLkvNjnlH95AAAAAAEPAAC4euUVR0meTpLkvNjnlH95AAABA0sZAAABEgAQAEP5xn5uIPRJvS72EGcN%2Fww%3D" naturalheight="0" naturalwidth="0" src="data:image/png;base64,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" size="0" tabindex="-1" data-outlook-trace="F:1|T:1" style="max-width:100%; height:auto" crossorigin="use-credentials"><br></span></p>
+				    </div>
                     ]]>
             </field>
         </record>
            <record id="email_template_main_purchase_contact" model="mail.template">
-		    <field name="name">Credit Information</field>
-             <field name="email_from">${('erp@viaphoton.com') |safe}</field>
-		    <field name="subject">Confirmation Mail on Credit Application</field>
+		    <field name="name">Credit Information Client</field>
+             <field name="email_from">${('sales@viaphoton.com') |safe}</field>
+		    <field name="subject">viaPhoton Credit Application</field>
             <field name="model_id" ref="base_vph.model_website_form_api"/>
             <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
                     <div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
-                        <p>Hello ${object.mp_name}!!,</p>
-                        <br/>
+                        <p>Hello ${object.mp_name},</p><br/>
+
                         <p>
-                        Thanks for your information. We have sent a confirmation email as well. viaPhoton values your business and will get back to you within the next 48 hours. If we can be of any assistance in the meantime please feel free to all us at 331 250 4040
-                        </p>
-                        <br/>
-                <p>Best regards,</p>
-				</div>
+                        Thanks for your information.
+                        </p><br/>
+
+                        <p>
+                            We have received your request. viaPhoton values your business and will get back to you within the next 48 hours.<br/>
+                            If we can be of any assistance in the meantime please feel free to all us at 331 240 4040.
+                        </p><br/>
+
+                        <p>Best regards,</p><br/>
+
+                        <table border="0" cellspacing="0" cellpadding="0" style="font-variant-numeric: inherit; font-variant-east-asian: inherit; font-stretch: inherit; font-size: 15px; line-height: inherit; font-family: &quot;Segoe UI&quot;, &quot;Segoe UI Web (West European)&quot;, &quot;Segoe UI&quot;, -apple-system, BlinkMacSystemFont, Roboto, &quot;Helvetica Neue&quot;, sans-serif; color: rgb(50, 49, 48); width: 352.5pt; border-collapse: collapse;">
+                            <tbody>
+                               <tr>
+                                  <td style="width: 7.5pt; padding: 0px 11.25pt;">
+                                     <p style="margin: 0px;">
+                                        <span style="margin: 0px; padding: 0px; border: 0px; font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; font-size: 10pt; line-height: inherit; font-family: &quot;Lucida Grande&quot;, sans-serif; vertical-align: baseline; color: inherit;">
+                                        <a href="http://url4775.viaphoton.com/ls/click?upn=sJdszWMusYg4s9mKOLItXbFMsgv32U5r92fRqN6gP6E-3DEf1C_RmaR1aNIKFjjlg1ctnHfxkd-2FWY6B9CFZCgpc3A1OdMIKUSTQjFnmEZgT-2BjYa6Ggbywyqt2oDmegQb6vL-2FErCO8m2u9alHQ-2BPh2gaZ1tfHTUO2GO-2BYq8-2Bcl3njsvzPaLzu-2Fk1tab-2FtK3YTzlGjvtp4dsELHeTepAFYkAXZG6FzyE6oSLoE2PgQGHIm7KbWkW8DVfJfIItEFG6es9RRvEsr8uhIsAdvjjl8-2BV9UZcwKY4-3D" target="_blank" rel="noopener noreferrer" data-auth="NotApplicable" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline;">
+                                        <span style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; color: windowtext; text-decoration-line: none;">
+                                        <span style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; color: rgb(217, 133, 24);">
+                                        <img data-imagetype="External" src="https://ci4.googleusercontent.com/proxy/hzdNwxM0FU8dzKBlATyjQMCKoJdsYQnei9pcJJsF-nwGRAx13-A-WNXxZyiskTfBWQzMADahKQ8MwF2gB-03R9uxRYiOHc44MOL9Iu2ZFseg3AoIxfIhH2DekaziiGdLMCH7IKkBmh7GP8kveiOt0aWG3yfgNc1WpMKMqkpLAAy1JvLukA=s0-d-e1-ft#https://d36urhup7zbd7q.cloudfront.net/e54b71a8-e071-4bf0-aaf1-5ae7a56a357f/LogoSquare02.format_png.resize_200x.png" border="0" alt="photo" id="x_m_-6227028351528780290_x005f_x0000_i1025" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; color: inherit; width: 48.74pt; height: 29.99pt;">
+                                        </span>
+                                        </span>
+                                        </a>
+                                        </span>
+                                     </p>
+                                  </td>
+                                  <td valign="top" style="padding: 0px; border-style: none solid none none; border-right-width: 1pt; border-right-color: rgb(224, 224, 224);">
+                                  </td>
+                                  <td valign="top" style="padding: 0px 11.25pt;">
+                                     <p style="margin: 0px;"><b>
+                                        <span style="margin: 0px; padding: 0px; border: 0px; font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; font-size: 10pt; line-height: inherit; font-family: Arial, sans-serif; vertical-align: baseline; color: rgb(61, 73, 89);">
+                                        Danielle Jones
+                                        </span></b>
+                                        <span style="margin: 0px; padding: 0px; border: 0px; font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; font-size: 10pt; line-height: inherit; font-family: Arial, sans-serif; vertical-align: baseline; color: rgb(61, 73, 89);">
+                                        <br>
+                                        </span>
+                                        <span style="margin: 0px; padding: 0px; border: 0px; font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; font-size: 9pt; line-height: inherit; font-family: Arial, sans-serif; vertical-align: baseline; color: rgb(100, 100, 100);">
+                                        Customer Success
+                                        </span>
+                                        <span style="margin: 0px; padding: 0px; border: 0px; font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; font-size: 10pt; line-height: inherit; font-family: Arial, sans-serif; vertical-align: baseline; color: rgb(61, 73, 89);">
+                                        </span>
+                                     </p>
+                                     <table border="0" cellspacing="0" cellpadding="0" style="font: inherit; width: 352.5pt; border-collapse: collapse;">
+                                        <tbody>
+                                           <tr>
+                                              <td style="padding: 0px;">
+                                                 <p style="margin-right: 0px; margin-bottom: 3.75pt; margin-left: 0px;">
+                                                    <span style="margin: 0px; padding: 0px; border: 0px; font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; font-size: 9pt; line-height: inherit; font-family: Arial, sans-serif; vertical-align: baseline; color: inherit;">
+                                                    <a href="tel:+13312404040" target="_blank" rel="noopener noreferrer" data-auth="NotApplicable" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline;">
+                                                    <span style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; color: rgb(217, 133, 24); text-decoration-line: none;">
+                                                    331-240-4040
+                                                    </span>
+                                                    </a>&nbsp;
+                                                    <span style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; color: rgb(224, 224, 224);">|</span>&nbsp;
+                                                    <a href="mailto:sales@viaphoton.com" target="_blank" rel="noopener noreferrer" data-auth="NotApplicable" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline;">
+                                                    <span style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; color: rgb(217, 133, 24); text-decoration-line: none;">
+                                                    sales@viaphoton.com
+                                                    </span>
+                                                    </a>
+                                                    </span>
+                                                 </p>
+                                                 <p style="margin-right: 0px; margin-bottom: 3.75pt; margin-left: 0px;"><span style="margin: 0px; padding: 0px; border: 0px; font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; font-size: 9pt; line-height: inherit; font-family: Arial, sans-serif; vertical-align: baseline; color: inherit;"><a href="http://url4775.viaphoton.com/ls/click?upn=sJdszWMusYg4s9mKOLItXbFMsgv32U5r92fRqN6gP6E-3D_uny_RmaR1aNIKFjjlg1ctnHfxkd-2FWY6B9CFZCgpc3A1OdMIKUSTQjFnmEZgT-2BjYa6GgbZslh8U4UVWFasTqpJgI2lrQ2Xdw77as-2FTnildoLSjoJMT2Tp-2BKJn3Vat5Aq1tHQKdISiOyovDUzCO36AfTO-2FXfaiD4PlokIIFGtuxyyQsPOEGJIqNl5UMcJeczezd-2B0e5GUi4sEcl-2B26qWJINWKbdhiFeg-2BH7WF0zNH-2BJ9YAUHs-3D" target="_blank" rel="noopener noreferrer" data-auth="NotApplicable" style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline;">
+                                                    <span style="margin: 0px; padding: 0px; border: 0px; font: inherit; vertical-align: baseline; color: rgb(217, 133, 24); text-decoration-line: none;">
+                                                    viaphoton.com
+                                                    </span>
+                                                    </a></span>
+                                                 </p>
+                                              </td>
+                                           </tr>
+                                        </tbody>
+                                     </table>
+                                  </td>
+                               </tr>
+                            </tbody>
+                         </table>
+				    </div>
                     ]]>
             </field>
         </record>
@@ -69,6 +138,7 @@
          <record id="email_template_for_cpq_lead_customer" model="mail.template">
 		    <field name="name">CPQ CRM Lead</field>
              <field name="email_from">${('erp@viaphoton.com') |safe}</field>
+             <field name="email_to">${object.partner_id.email}</field>
 		    <field name="subject">viaPhoton | ${object.name}</field>
             <field name="model_id" ref="base_vph.model_crm_lead"/>
             <field name="auto_delete" eval="False"/>
@@ -89,48 +159,45 @@
          <record id="email_template_for_cpq_sales_repsentative" model="mail.template">
 		    <field name="name">Quotation Sale CPQ</field>
              <field name="email_from">${('erp@viaphoton.com') |safe}</field>
-            <field name="reply_to">${object.company_id.sales_email}</field>
-
+            <field name="reply_to">${object.company_id.sales_email} </field>
 		    <field name="subject">New ${object.name} | ${object.partner_id.name}</field>
             <field name="model_id" ref="base_vph.model_sale_order"/>
             <field name="auto_delete" eval="False"/>
             <field name="body_html"><![CDATA[
+
             % set details = object.get_bom_details()
 
-                    <div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
-                        <p>Yohoo!!,</p>
-				    <p>We have a new client on board inquiring for our products and services.If you have any questions related to this mail, you can contact Ha.”</p>
-				    <br/>
-				    <p> Below are the Inquiry details:</p>
+                    <div style="font-family:'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif;font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+                        <p>Great news!</p>
+				    <p>We have received a new lead from the CPQ tool and a draft SO has been created in Odoo.</p>
+				    <br>
+				    <p><b>Contact details:</b></p>
                 % for i in details:
-                        <b>Customer Name</b> ${i['cus_name']},
-                        <br/>
-                        <b>Customer Email</b> ${i['cus_email']},
-                        <br/>
-                        <b>Customer Phone</b> ${i['cus_phone']}
-                        <br/>
-                        <br/>
-            <table style="background-color:#ededed;border-collapse:collapse;" border="0" width="100%">
+                        <b>Name</b> ${i['cus_name']},
+                        <br>
+                        <b>Email</b> ${i['cus_email']},
+                        <br>
+                        <b>Phone</b> ${i['cus_phone']}
+                        <br>
+                        <br>
+                    <p><b>Products requested for quotation:</b></p>
+            <table style="background-color:#ededed;" border="0" width="60%">
                     <tbody>
                         <tr>
-                            <th style="padding:0px;text-align:center;border:1px solid black;width:20%;" class="text-center">Part Number</th>
-                            <th style="padding:0px;text-align:center;border:1px solid black;width:20%;" class="text-center">Full Part Number</th>
-                            <th style="padding:0px;text-align:center;border:1px solid black;width:20%;" class="text-center">Quantity</th>
+                            <th style="padding:0px;border:1px solid black;width:70%;" class="text-center">Part Number</th>
+                            <th style="padding:0px;border:1px solid black;width:30%;" class="text-center">Quantity</th>
                         </tr>
                     </tbody>
                 </table>
             %for e in i['bom_details']:
 
-            <table style="background-color:#ededed;border-collapse:collapse;" border="0" width="100%">
+            <table style="background-color:#ededed;" border="0" width="60%">
                 <tbody>
                     <tr>
-                        <td style="border:1px solid black;padding:2px;width:20%;">
-                            ${e['bom_name']}
-                        </td>
-                        <td style="border:1px solid black;padding:2px;width:20%;">
+                        <td style="border:1px solid black;padding:2px;width:70%;">
                             ${e['full_pn']}
                         </td>
-                        <td style="border:1px solid black;padding:2px;width:20%;">
+                        <td style="border:1px solid black;padding:2px;width:30%;" align="center">
                             ${e['qty']}
                         </td>
                     </tr>
@@ -138,18 +205,21 @@
                 </table>
                 %endfor
                 %endfor
-				<br/>
-                    <p>Please check the link below for more details:</p>
+				<br>
+                    <p>Click on the link below to see the draft SO in Odoo:</p>
 
                     % set website_url = object.get_website_url()
-                    Your Odoo domain is:
-                     <br/>
-                     <br/>
-                     <b><a href="${website_url}">VIEW DETAILS</a></b><br>
-                     <br/>
-                <p>Best regards,</p>
+                    % set lead_website_url = object.get_lead_website_url()
+                     <br>
+                     <br>
+                     <b><a href="${website_url}">ORDER DETAILS</a></b><br>
+                     <b><a href="${lead_website_url}">LEAD DETAILS</a></b><br>
+                     <br>
+                <p>Good luck in closing the sale!</p>
 
 				</div>
+
+
                     ]]>
             </field>
         </record>
@@ -182,9 +252,8 @@
             <table style="background-color:#ededed;border-collapse:collapse;" border="0" width="100%">
                     <tbody>
                         <tr>
-                            <th style="padding:0px;text-align:center;border:1px solid black;width:20%;" class="text-center">Part Number</th>
-                            <th style="padding:0px;text-align:center;border:1px solid black;width:20%;" class="text-center">Full Part Number</th>
-                            <th style="padding:0px;text-align:center;border:1px solid black;width:20%;" class="text-center">Quantity</th>
+                            <th style="padding:0px;text-align:center;border:1px solid black;width:10%;" class="text-center">Part Number</th>
+                            <th style="padding:0px;text-align:center;border:1px solid black;width:10%;" class="text-center">Quantity</th>
                         </tr>
                     </tbody>
                 </table>
@@ -194,13 +263,10 @@
             <table style="background-color:#ededed;border-collapse:collapse;" border="0" width="100%">
                 <tbody>
                     <tr>
-                        <td style="border:1px solid black;padding:2px;width:20%;">
-                            ${e['bom_name']}
-                        </td>
-                        <td style="border:1px solid black;padding:2px;width:20%;">
+                        <td style="border:1px solid black;padding:2px;width:10%;">
                             ${e['full_pn']}
                         </td>
-                        <td style="border:1px solid black;padding:2px;width:20%;">
+                        <td style="border:1px solid black;padding:2px;width:10%;">
                             ${e['qty']}
                         </td>
                     </tr>

@@ -104,8 +104,10 @@ class WebsiteFormApi(models.Model):
         url = urljoin(base_url, "/web?%s#%s" % (urlencode(query), urlencode(fragment)))
         return url
 
-    # send mail to users once credit application created
     def send_mail_credit_info(self):
+        """
+        Send email to users once credit application created
+        """
         for record in self:
             recepient_users = self.env["res.users"].search(
                 [("send_credit_info", "=", True)]
@@ -115,19 +117,19 @@ class WebsiteFormApi(models.Model):
                     [user.partner_id.email + "," for user in recepient_users]
                 )
                 email_to = email_to[:-1]
+
                 # to send mail on credit info creation
-                temp_id = self.env.ref("base_vph.email_template_for_credit_info")
-                if temp_id:
-                    temp_id.write(
+                mail_template = self.env.ref("base_vph.email_template_for_credit_info")
+                if mail_template:
+                    mail_template.write(
                         {"email_to": email_to,}
                     )
-                    values = temp_id.generate_email(record.id)
-                    mail_mail_obj = self.env["mail.mail"]
-                    msg_id = mail_mail_obj.create(values)
+                    values = mail_template.generate_email(record.id)
+                    mail_obj = self.env["mail.mail"]
+                    msg_id = mail_obj.create(values)
                     msg_id.send()
             record.mail_sent = True
             # record.message_post(body=body)
-        return True
 
     # credit applications are not allowed to be copied
     def copy(self, default=None):
@@ -136,34 +138,48 @@ class WebsiteFormApi(models.Model):
         raise UserError(_("You are not allowed to copy the Credit Application!!"))
         return res
 
-    # sending mail to purchase contact of credit application
-    def send_mail_to_mp(self):
+    def send_mail_to_main_purchase(self):
+        """
+        Send email to main purchase contact
+        """
         for record in self:
             if record.mp_email:
                 email_to = record.mp_email
-                temp_id = self.env.ref("base_vph.email_template_main_purchase_contact")
-                if temp_id:
-                    temp_id.write(
+                mail_template = self.env.ref(
+                    "base_vph.email_template_main_purchase_contact"
+                )
+                if mail_template:
+                    mail_template.write(
                         {"email_to": email_to,}
                     )
-                    values = temp_id.generate_email(record.id)
-                    mail_mail_obj = self.env["mail.mail"]
-                    msg_id = mail_mail_obj.create(values)
+                    values = mail_template.generate_email(record.id)
+                    mail_obj = self.env["mail.mail"]
+                    msg_id = mail_obj.create(values)
                     msg_id.send()
-        return True
 
-    # to create a record in credit info form through api call
-    def create_rec(self, json_dict):
-        for credit_info in json_dict.get("credit_info"):
+    def create_record(self, data):
+        """
+        Creates a record in credit applications
+        """
+
+        credit_amt_req = None
+        dnb_no = None
+        for credit_info in data.get("credit_info"):
             credit_amt_req = credit_info.get("credit_amt_req")
             dnb_no = credit_info.get("dnb_no")
-        for bank_info in json_dict.get("bank_details"):
+
+        bank_contact = None
+        bank_name = None
+        bank_email = None
+        bank_phn = None
+        for bank_info in data.get("bank_details"):
             bank_contact = bank_info.get("bank_contact")
             bank_name = bank_info.get("bank_name")
             bank_email = bank_info.get("bank_email")
             bank_phn = bank_info.get("bank_phone")
+
         trade_list = []
-        for trade_ref in json_dict.get("trade_ref_ids"):
+        for trade_ref in data.get("trade_ref_ids"):
             trade_dict = (
                 0,
                 0,
@@ -178,24 +194,24 @@ class WebsiteFormApi(models.Model):
 
         web_from_id = self.create(
             {
-                "name": json_dict.get("name"),
-                "address": json_dict.get("address"),
-                "city": json_dict.get("city"),
-                "state": json_dict.get("state"),
-                "zip": json_dict.get("zip"),
-                "fein": json_dict.get("fein"),
-                "mp_name": json_dict.get("mp_name"),
-                "mp_email": json_dict.get("mp_email"),
-                "mp_phone": json_dict.get("mp_phone"),
-                "ap_name": json_dict.get("ap_name"),
-                "ap_email": json_dict.get("ap_email"),
-                "ap_phone": json_dict.get("ap_phone"),
-                "owner_name": json_dict.get("owner_name"),
-                "owner_email": json_dict.get("owner_email"),
-                "owner_phone": json_dict.get("owner_phone"),
-                "cfo_name": json_dict.get("cfo_name"),
-                "cfo_email": json_dict.get("cfo_email"),
-                "cfo_phone": json_dict.get("cfo_phone"),
+                "name": data.get("name"),
+                "address": data.get("address"),
+                "city": data.get("city"),
+                "state": data.get("state"),
+                "zip": data.get("zip"),
+                "fein": data.get("fein"),
+                "mp_name": data.get("mp_name"),
+                "mp_email": data.get("mp_email"),
+                "mp_phone": data.get("mp_phone"),
+                "ap_name": data.get("ap_name"),
+                "ap_email": data.get("ap_email"),
+                "ap_phone": data.get("ap_phone"),
+                "owner_name": data.get("owner_name"),
+                "owner_email": data.get("owner_email"),
+                "owner_phone": data.get("owner_phone"),
+                "cfo_name": data.get("cfo_name"),
+                "cfo_email": data.get("cfo_email"),
+                "cfo_phone": data.get("cfo_phone"),
                 "credit_amt_req": credit_amt_req,
                 "dnb_no": dnb_no,
                 "bank_contact": bank_contact,
@@ -212,7 +228,7 @@ class WebsiteFormApi(models.Model):
     def create(self, vals):
         web_form_id = super(WebsiteFormApi, self).create(vals)
         web_form_id.send_mail_credit_info()
-        web_form_id.send_mail_to_mp()
+        web_form_id.send_mail_to_main_purchase()
         return web_form_id
 
 

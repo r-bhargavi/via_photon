@@ -7,7 +7,7 @@
 ###################################################################################
 
 {
-    "name": "Base Integrations Developments for viaPhoton",
+    "name": "Base Integrations for viaPhoton",
     "category": "Hidden",
     "author": "Technosavvy Infotech",
     "summary": "Custom",
@@ -18,6 +18,7 @@ AUTHOR OF MODULE DOES NOT CLAIM ANY
 RESPONSIBILITY FOR ANY BEHAVIOR ONCE INSTALLED.
         """,
     "depends": [
+        "base_vph",
         "mrp",
         "quality_control",
         "mrp_account",
@@ -25,6 +26,6 @@ RESPONSIBILITY FOR ANY BEHAVIOR ONCE INSTALLED.
         "mrp_workorder",
         "mrp_plm",
     ],
-    "data": [],
+    "data": ["security/ir.model.access.csv", "views/ir_ui_views.xml",],
     "installable": True,
 }
