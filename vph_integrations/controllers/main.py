@@ -79,16 +79,16 @@ class OdooBlinkIntegrate(http.Controller):
                 return "No WorkStation ID provided"
             if not final_dictionary.get("workstation_model"):
                 return "No WorkStation Model provided"
-            try:
-                wo_resp = (
-                    request.env["mrp.workorder"].sudo().get_wo_details(final_dictionary)
-                )
+            # try:
+            wo_resp = (
+                request.env["mrp.workorder"].sudo().get_wo_details(final_dictionary)
+            )
 
-                if isinstance(wo_resp, dict):
-                    message = wo_resp
-                    return message
-                else:
-                    return wo_resp
+            if isinstance(wo_resp, dict):
+                message = wo_resp
+                return message
+            else:
+                return wo_resp
 
-            except Exception as e:
-                return "Fetch details Failed from Odoo"
+            # except Exception as e:
+            #   return "Fetch details Failed from Odoo"
